@@ -82,17 +82,25 @@ const MakkalKuralAI = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  const getGreeting = (lang) => lang === 'ta'
+    ? 'வணக்கம்! நான் மக்கள் குரல் AI. உங்கள் அரசு சார்ந்த பிரச்சனைகளுக்கு உதவ இங்கே இருக்கிறேன்.\n\nRTI தாக்கல், புகார் எழுதுவது, உரிமைகள் புரிந்துகொள்வது — எதுவும் கேளுங்கள் 👇'
+    : 'Hello! I\'m Makkal Kural AI, your Tamil Nadu civic rights assistant.\n\nI can help you raise issues, file RTIs, understand your rights, and navigate government systems. What can I help you with?';
+
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      setMessages([{
-        role: 'assistant',
-        content: language === 'ta'
-          ? 'வணக்கம்! நான் மக்கள் குரல் AI. உங்கள் அரசு சார்ந்த பிரச்சனைகளுக்கு உதவ இங்கே இருக்கிறேன்.\n\nRTI தாக்கல், புகார் எழுதுவது, உரிமைகள் புரிந்துகொள்வது — எதுவும் கேளுங்கள் 👇'
-          : 'Hello! I\'m Makkal Kural AI, your Tamil Nadu civic rights assistant.\n\nI can help you raise issues, file RTIs, understand your rights, and navigate government systems. What can I help you with?',
-        isGreeting: true,
-      }]);
+      setMessages([{ role: 'assistant', content: getGreeting(language), isGreeting: true }]);
     }
   }, [isOpen]);
+
+  // Update greeting when language is switched (only if only greeting is shown)
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].isGreeting) {
+        return [{ role: 'assistant', content: getGreeting(language), isGreeting: true }];
+      }
+      return prev;
+    });
+  }, [language]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -144,13 +152,7 @@ const MakkalKuralAI = () => {
   const clearChat = () => {
     setMessages([]);
     setTimeout(() => {
-      setMessages([{
-        role: 'assistant',
-        content: language === 'ta'
-          ? 'வணக்கம்! புதிய உரையாடல் தொடங்கியது. என்ன உதவி வேண்டும்?'
-          : 'Hello! New conversation started. How can I help you?',
-        isGreeting: true,
-      }]);
+      setMessages([{ role: 'assistant', content: getGreeting(language), isGreeting: true }]);
     }, 100);
   };
 
